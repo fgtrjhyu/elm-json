@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="elm.js"></script>
+  </head>
+  <body>
+    <div id="myapp"></div>
+  </body>
+  <script type="text/javascript">
+    var valueJson = localStorage.getItem('value')
+
+    console.log('load a value in JavaScript', valueJson, typeof valueJson);
+
+    var value = valueJson != null ? JSON.parse(valueJson) : null;
+
+    var app = Elm.Main.init({
+      node: document.getElementById('myapp')
+    , flags: value
+    });
+
+    app.ports.store.subscribe(function(value) {
+      console.log('store the value in JavaScript', value, typeof value)
+      localStorage.setItem('value', JSON.stringify(value))
+    });
+
+    app.ports.remove.subscribe(function() {
+      localStorage.removeItem('value')
+    });
+  </script>
+</html>
+
