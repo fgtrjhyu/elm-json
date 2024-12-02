@@ -5161,16 +5161,74 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$DecodeErr = {$: 'DecodeErr'};
 var $elm$json$Json$Decode$decodeValue = _Json_run;
-var $author$project$Main$Model = function (value) {
-	return {value: value};
+var $author$project$Main$Model = F2(
+	function (value, children) {
+		return {children: children, value: value};
+	});
+var $author$project$Main$Child1 = function (a) {
+	return {$: 'Child1', a: a};
 };
+var $author$project$Main$Child2 = function (a) {
+	return {$: 'Child2', a: a};
+};
+var $author$project$Main$Bar = F3(
+	function (name, cmd, files) {
+		return {cmd: cmd, files: files, name: name};
+	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$map3 = _Json_map3;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$barDecoder = A4(
+	$elm$json$Json$Decode$map3,
+	$author$project$Main$Bar,
+	A2($elm$json$Json$Decode$field, 'name', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'cmd', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'files', $elm$json$Json$Decode$string));
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $author$project$Main$checkName = F2(
+	function (name, decoder) {
+		return A2(
+			$elm$json$Json$Decode$andThen,
+			function (doc) {
+				if (doc.$ === 'Child1') {
+					var child = doc.a;
+					return _Utils_eq(child.name, name) ? $elm$json$Json$Decode$succeed(doc) : $elm$json$Json$Decode$fail(name);
+				} else {
+					var child = doc.a;
+					return _Utils_eq(child.name, name) ? $elm$json$Json$Decode$succeed(doc) : $elm$json$Json$Decode$fail(name);
+				}
+			},
+			decoder);
+	});
+var $author$project$Main$Foo = F2(
+	function (name, foo) {
+		return {foo: foo, name: name};
+	});
+var $author$project$Main$fooDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Main$Foo,
+	A2($elm$json$Json$Decode$field, 'name', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'foo', $elm$json$Json$Decode$string));
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $author$project$Main$childDecoder = $elm$json$Json$Decode$oneOf(
+	_List_fromArray(
+		[
+			A2(
+			$author$project$Main$checkName,
+			'Foo',
+			A2($elm$json$Json$Decode$map, $author$project$Main$Child1, $author$project$Main$fooDecoder)),
+			A2(
+			$author$project$Main$checkName,
+			'Bar',
+			A2($elm$json$Json$Decode$map, $author$project$Main$Child2, $author$project$Main$barDecoder))
+		]));
+var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Main$Empty = function (a) {
 	return {$: 'Empty', a: a};
 };
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$json$Json$Decode$null = _Json_decodeNull;
-var $elm$json$Json$Decode$oneOf = _Json_oneOf;
 var $elm$json$Json$Decode$nullable = function (decoder) {
 	return $elm$json$Json$Decode$oneOf(
 		_List_fromArray(
@@ -5179,7 +5237,6 @@ var $elm$json$Json$Decode$nullable = function (decoder) {
 				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder)
 			]));
 };
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$Limit = function (a) {
 	return {$: 'Limit', a: a};
 };
@@ -5224,10 +5281,14 @@ var $author$project$Main$valueDecoder = $elm$json$Json$Decode$oneOf(
 			$elm$json$Json$Decode$nullable($elm$json$Json$Decode$int)),
 			A2($elm$json$Json$Decode$map, $author$project$Main$valueFromString, $elm$json$Json$Decode$string)
 		]));
-var $author$project$Main$modelDecoder = A2(
-	$elm$json$Json$Decode$map,
+var $author$project$Main$modelDecoder = A3(
+	$elm$json$Json$Decode$map2,
 	$author$project$Main$Model,
-	A2($elm$json$Json$Decode$field, 'value', $author$project$Main$valueDecoder));
+	A2($elm$json$Json$Decode$field, 'value', $author$project$Main$valueDecoder),
+	A2(
+		$elm$json$Json$Decode$field,
+		'children',
+		$elm$json$Json$Decode$list($author$project$Main$childDecoder)));
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (flags) {
@@ -5238,16 +5299,104 @@ var $author$project$Main$init = function (flags) {
 				var model = _v0.a;
 				return model;
 			} else {
-				return {value: $author$project$Main$DecodeErr};
+				return {children: _List_Nil, value: $author$project$Main$DecodeErr};
 			}
 		}(),
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Main$encodeBar = function (doc) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'name',
+				$elm$json$Json$Encode$string(doc.name)),
+				_Utils_Tuple2(
+				'cmd',
+				$elm$json$Json$Encode$string(doc.cmd)),
+				_Utils_Tuple2(
+				'files',
+				$elm$json$Json$Encode$string(doc.files))
+			]));
+};
+var $author$project$Main$encodeFoo = function (doc) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'name',
+				$elm$json$Json$Encode$string(doc.name)),
+				_Utils_Tuple2(
+				'foo',
+				$elm$json$Json$Encode$string(doc.foo))
+			]));
+};
+var $author$project$Main$encodeChild = function (child) {
+	if (child.$ === 'Child1') {
+		var doc = child.a;
+		return $author$project$Main$encodeFoo(doc);
+	} else {
+		var doc = child.a;
+		return $author$project$Main$encodeBar(doc);
+	}
+};
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
+var $author$project$Main$encodeChildren = $elm$json$Json$Encode$list($author$project$Main$encodeChild);
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$null = _Json_encodeNull;
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$encodeValue = function (value) {
 	switch (value.$) {
 		case 'Empty':
@@ -5269,26 +5418,16 @@ var $author$project$Main$encodeValue = function (value) {
 			return $elm$json$Json$Encode$null;
 	}
 };
-var $elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v0, obj) {
-					var k = _v0.a;
-					var v = _v0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
-};
 var $author$project$Main$encode = function (model) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
 				'value',
-				$author$project$Main$encodeValue(model.value))
+				$author$project$Main$encodeValue(model.value)),
+				_Utils_Tuple2(
+				'children',
+				$author$project$Main$encodeChildren(model.children))
 			]));
 };
 var $author$project$Main$remove = _Platform_outgoingPort(
@@ -5296,24 +5435,219 @@ var $author$project$Main$remove = _Platform_outgoingPort(
 	function ($) {
 		return $elm$json$Json$Encode$null;
 	});
+var $author$project$Main$replaceAt = F4(
+	function (position, newElem, index, curElem) {
+		return _Utils_eq(position, index) ? newElem : curElem;
+	});
 var $author$project$Main$store = _Platform_outgoingPort('store', $elm$core$Basics$identity);
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'ValueChanged') {
-			var newValue = msg.a;
-			var newModel = _Utils_update(
-				model,
-				{
-					value: $author$project$Main$valueFromString(newValue)
-				});
-			return _Utils_Tuple2(
-				newModel,
-				$author$project$Main$store(
-					$author$project$Main$encode(newModel)));
-		} else {
-			return _Utils_Tuple2(
-				model,
-				$author$project$Main$remove(_Utils_Tuple0));
+		switch (msg.$) {
+			case 'ValueChanged':
+				var newValue = msg.a;
+				var newModel = _Utils_update(
+					model,
+					{
+						value: $author$project$Main$valueFromString(newValue)
+					});
+				return _Utils_Tuple2(
+					newModel,
+					$author$project$Main$store(
+						$author$project$Main$encode(newModel)));
+			case 'Remove':
+				return _Utils_Tuple2(
+					model,
+					$author$project$Main$remove(_Utils_Tuple0));
+			case 'AddChild':
+				var name = msg.a;
+				var maybe = function () {
+					switch (name) {
+						case 'Foo':
+							return $elm$core$Maybe$Just(
+								$author$project$Main$Child1(
+									A2($author$project$Main$Foo, name, '')));
+						case 'Bar':
+							return $elm$core$Maybe$Just(
+								$author$project$Main$Child2(
+									A3($author$project$Main$Bar, name, '', '')));
+						default:
+							return $elm$core$Maybe$Nothing;
+					}
+				}();
+				var newModel = function () {
+					if (maybe.$ === 'Just') {
+						var child = maybe.a;
+						return _Utils_update(
+							model,
+							{
+								children: A2(
+									$elm$core$List$append,
+									model.children,
+									_List_fromArray(
+										[child]))
+							});
+					} else {
+						return model;
+					}
+				}();
+				return _Utils_Tuple2(
+					newModel,
+					$author$project$Main$store(
+						$author$project$Main$encode(newModel)));
+			case 'RemoveChildAt':
+				var index = msg.a;
+				var children = model.children;
+				var newChildren = _Utils_ap(
+					A2($elm$core$List$take, index, children),
+					A2($elm$core$List$drop, index + 1, children));
+				var newModel = _Utils_update(
+					model,
+					{children: newChildren});
+				return _Utils_Tuple2(
+					newModel,
+					$author$project$Main$store(
+						$author$project$Main$encode(newModel)));
+			default:
+				var position = msg.a;
+				var newChild = msg.b;
+				var children = model.children;
+				var newChildren = A2(
+					$elm$core$List$indexedMap,
+					A2($author$project$Main$replaceAt, position, newChild),
+					children);
+				var newModel = _Utils_update(
+					model,
+					{children: newChildren});
+				return _Utils_Tuple2(
+					newModel,
+					$author$project$Main$store(
+						$author$project$Main$encode(newModel)));
 		}
 	});
 var $elm$json$Json$Decode$value = _Json_decodeValue;
@@ -5321,32 +5655,37 @@ var $author$project$Main$Remove = {$: 'Remove'};
 var $author$project$Main$ValueChanged = function (a) {
 	return {$: 'ValueChanged', a: a};
 };
+var $author$project$Main$AddChild = function (a) {
+	return {$: 'AddChild', a: a};
+};
+var $author$project$Main$addChild = function (name) {
+	return $elm$json$Json$Decode$succeed(
+		$author$project$Main$AddChild(name));
+};
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
+var $author$project$Main$ReplaceChildAt = F2(
+	function (a, b) {
+		return {$: 'ReplaceChildAt', a: a, b: b};
 	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -5372,10 +5711,234 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$displayBar = F3(
+	function (index, doc, textChanged) {
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h3,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(doc.name)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$label,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('cmd'),
+									A2(
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$type_('text'),
+											$elm$html$Html$Attributes$name('cmd'),
+											$elm$html$Html$Attributes$value(doc.cmd),
+											$elm$html$Html$Events$onInput(
+											textChanged(
+												function (text) {
+													return _Utils_update(
+														doc,
+														{cmd: text});
+												}))
+										]),
+									_List_Nil)
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$label,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('files'),
+									A2(
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$type_('text'),
+											$elm$html$Html$Attributes$name('files'),
+											$elm$html$Html$Attributes$value(doc.files),
+											$elm$html$Html$Events$onInput(
+											textChanged(
+												function (text) {
+													return _Utils_update(
+														doc,
+														{files: text});
+												}))
+										]),
+									_List_Nil)
+								]))
+						]))
+				]));
+	});
+var $author$project$Main$displayFoo = F3(
+	function (index, doc, textChanged) {
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h3,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(doc.name)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$label,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('foo'),
+									A2(
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$type_('text'),
+											$elm$html$Html$Attributes$name('foo'),
+											$elm$html$Html$Attributes$value(doc.foo),
+											$elm$html$Html$Events$onInput(
+											textChanged(
+												function (text) {
+													return _Utils_update(
+														doc,
+														{foo: text});
+												}))
+										]),
+									_List_Nil)
+								]))
+						]))
+				]));
+	});
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $author$project$Main$RemoveChildAt = function (a) {
+	return {$: 'RemoveChildAt', a: a};
+};
+var $author$project$Main$removeChild = function (index) {
+	return $elm$json$Json$Decode$succeed(
+		$author$project$Main$RemoveChildAt(index));
+};
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $author$project$Main$displayChild = F2(
+	function (index, child) {
+		var textChangedAt = function (ch) {
+			return function (cons) {
+				return function (text) {
+					return A2(
+						$author$project$Main$ReplaceChildAt,
+						index,
+						ch(
+							cons(text)));
+				};
+			};
+		};
+		var docHtml = function () {
+			if (child.$ === 'Child1') {
+				var doc = child.a;
+				return A3(
+					$author$project$Main$displayFoo,
+					index,
+					doc,
+					textChangedAt($author$project$Main$Child1));
+			} else {
+				var doc = child.a;
+				return A3(
+					$author$project$Main$displayBar,
+					index,
+					doc,
+					textChangedAt($author$project$Main$Child2));
+			}
+		}();
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'border-top', '1px solid black'),
+					A2($elm$html$Html$Attributes$style, 'margin-top', '1em')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'padding-top', '1em')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$label,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'padding-right', '1em')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromInt(index))
+								])),
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$type_('button'),
+									A2(
+									$elm$html$Html$Events$on,
+									'click',
+									$author$project$Main$removeChild(index))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('remove')
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[docHtml]))
+				]));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $author$project$Main$reasonToHtml = function (inputView) {
 	var _v0 = inputView.reason;
 	if (_v0.$ === 'Nothing') {
@@ -5446,23 +6009,13 @@ var $author$project$Main$toInputView = function (value) {
 				$elm$core$Maybe$Just('decode error'));
 	}
 };
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
 	var inputView = $author$project$Main$toInputView(model.value);
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'padding', '1em'),
-				A2($elm$html$Html$Attributes$style, 'width', '256px')
+				A2($elm$html$Html$Attributes$style, 'padding', '1em')
 			]),
 		_List_fromArray(
 			[
@@ -5512,7 +6065,45 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$text('remove')
 							]))
-					]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('button'),
+								A2(
+								$elm$html$Html$Events$on,
+								'click',
+								$author$project$Main$addChild('Foo'))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('add Foo')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('button'),
+								A2(
+								$elm$html$Html$Events$on,
+								'click',
+								$author$project$Main$addChild('Bar'))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('add Bar')
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				A2($elm$core$List$indexedMap, $author$project$Main$displayChild, model.children))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
