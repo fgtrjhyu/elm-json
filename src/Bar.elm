@@ -25,14 +25,14 @@ default =
 -- HTML
 view : Bar -> ((String -> Bar) -> (String -> msg)) -> Html msg
 view self textChanged =
-  Html.div [] 
-    [ Html.h3 [] 
-        [ Html.text self.className ]
-    , Html.div []
+  div [] 
+    [ h3 [] 
+        [ text self.className ]
+    , div []
         [ 
-          Html.label []
+          label []
             [ text "cmd" 
-            , Html.input
+            , input
                 [
                   type_ "text"
                 , name "cmd"
@@ -43,11 +43,11 @@ view self textChanged =
                 ]
             ]
         ]
-    , Html.div []
+    , div []
         [ 
-          Html.label []
+          label []
             [ text "files" 
-            , Html.input
+            , input
                 [
                   type_ "text"
                 , name "files"

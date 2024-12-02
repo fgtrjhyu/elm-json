@@ -24,14 +24,14 @@ default =
 -- HTML
 view : Baz -> ((String -> Baz) -> (String -> msg)) -> Html msg
 view self textChanged =
-  Html.div [] 
-    [ Html.h3 [] 
-        [ Html.text self.className ]
-    , Html.div []
+  div [] 
+    [ h3 [] 
+        [ text self.className ]
+    , div []
         [ 
-          Html.label []
+          label []
             [ text "value" 
-            , Html.input
+            , input
                 [
                   type_ "text"
                 , name "value"
