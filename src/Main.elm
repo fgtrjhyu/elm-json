@@ -6,7 +6,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as D
 import Json.Encode as E
-import Array exposing (fromList, toList)
+import Baz exposing (Baz)
+import Foo exposing (Foo)
+import Bar exposing (Bar)
 
 main : Program E.Value Model Msg
 main =
@@ -31,26 +33,15 @@ type Value
   | DecodeErr
   | Succeed Int
 
-type alias Foo =
-  { name : String
-  , foo : String
-  }
-
-type alias Bar =
-  { name : String
-  , cmd : String
-  , files : String
-  }
-
-type Child
-  = Child1 Foo
-  | Child2 Bar
+type CType
+  = CTFoo Foo
+  | CTBar Bar
+  | CTBaz Baz
 
 type alias Model =
   { value : Value
-  , children : List Child
+  , children : List CType
   }
-
 
 init : E.Value -> ( Model, Cmd Msg )
 init flags =
@@ -66,9 +57,9 @@ init flags =
 type Msg
   = ValueChanged String
   | Remove
-  | AddChild String
+  | AddCType String
   | RemoveChildAt Int
-  | ReplaceChildAt Int Child
+  | ReplaceChildAt Int CType
 
 valueFromInt : Int -> Value
 valueFromInt integer =
@@ -104,17 +95,23 @@ update msg model =
       ( model
       , (remove ())
       )
-    AddChild name ->
+    AddCType className ->
       let
-          maybe = case name of
-            "Foo" -> (Just (Child1 (Foo name "")))
-            "Bar" -> (Just (Child2 (Bar name "" "")))
-            _ -> Nothing
-          newModel = case maybe of
-            Just child ->
-              { model | children = (List.append model.children [ child ]) }
-            Nothing ->
-              model
+          maybe =
+            case className of
+              "Foo" -> (Just (CTFoo (Foo.default)))
+              "Bar" -> (Just (CTBar (Bar.default)))
+              "Baz" -> (Just (CTBaz (Baz.default)))
+              _ -> Nothing
+
+          newChildren =
+            case maybe of
+              Just child ->
+                (List.append model.children [ child ])
+              Nothing ->
+                model.children
+
+          newModel = { model | children = newChildren }
       in
       (
         newModel
@@ -132,10 +129,10 @@ update msg model =
         newModel
       , (store (encode newModel))
       )
-    ReplaceChildAt position newChild ->
+    ReplaceChildAt position newCType ->
       let
         children = model.children
-        newChildren = (List.indexedMap (replaceAt position newChild) children)
+        newChildren = (List.indexedMap (replaceAt position newCType) children)
         newModel = { model | children = newChildren }
       in
       (
@@ -143,7 +140,7 @@ update msg model =
       , (store (encode newModel))
       )
 
-replaceAt :  Int -> Child -> Int -> Child -> Child
+replaceAt :  Int -> CType -> Int -> CType -> CType
 replaceAt position newElem index curElem =
   if position == index then
     newElem
@@ -215,84 +212,33 @@ view model =
       , div []
           [ button
               [ type_ "button"
-              , on "click" (addChild "Foo")
+              , onClick (AddCType "Foo")
               ]
               [ text "add Foo" ]
           , button
               [ type_ "button"
-              , on "click" (addChild "Bar")
+              , onClick (AddCType "Bar")
               ]
               [ text "add Bar" ]
+          , button
+              [ type_ "button"
+              , onClick (AddCType "Baz")
+              ]
+              [ text "add Baz" ]
           ]
       , div []
-          (model.children |> List.indexedMap displayChild)
+          (model.children |> List.indexedMap displayCType)
       ]
 
-displayFoo : Int -> Foo -> ((String -> Foo) -> (String -> Msg)) -> Html Msg
-displayFoo index doc textChanged =
-  Html.div [] 
-    [ Html.h3 [] 
-        [ Html.text doc.name ]
-    , Html.div []
-        [ 
-          Html.label []
-            [ text "foo" 
-            , Html.input
-                [
-                  type_ "text"
-                , name "foo"
-                , value doc.foo
-                , onInput (textChanged (\text -> { doc | foo = text}))
-                ]
-                [
-                ]
-            ]
-        ]
-    ]
-
-displayBar : Int -> Bar -> ((String -> Bar) -> (String -> Msg)) -> Html Msg
-displayBar index doc textChanged =
-  Html.div [] 
-    [ Html.h3 [] 
-        [ Html.text doc.name ]
-    , Html.div []
-        [ Html.label []
-            [ text "cmd"
-            , Html.input
-                [
-                  type_ "text"
-                , name "cmd"
-                , value doc.cmd
-                , onInput (textChanged (\text -> { doc | cmd = text}))
-                ]
-                [
-                ]
-            ]
-        ]
-    , Html.div []
-        [ Html.label []
-            [ text "files"
-            , Html.input
-                [
-                  type_ "text"
-                , name "files"
-                , value doc.files
-                , onInput (textChanged (\text -> { doc | files = text}))
-                ]
-                [
-                ]
-            ]
-        ]
-    ]
-
-displayChild : Int -> Child -> Html Msg
-displayChild index child =
+displayCType : Int -> CType -> Html Msg
+displayCType index child =
   let
-    textChangedAt = (\ch -> (\cons -> (\text -> (ReplaceChildAt index (ch (cons text))))))
+    textChangedAt = (\ch cons text -> (ReplaceChildAt index (ch (cons text))))
     docHtml =
       case child of
-        Child1 doc -> (displayFoo index doc (textChangedAt Child1))
-        Child2 doc -> (displayBar index doc (textChangedAt Child2))
+        CTFoo content -> (Foo.view content (textChangedAt CTFoo))
+        CTBar content -> (Bar.view content (textChangedAt CTBar))
+        CTBaz content -> (Baz.view content (textChangedAt CTBaz))
   in
     div
       [ style "border-top" "1px solid black"
@@ -309,7 +255,7 @@ displayChild index child =
               [ text (String.fromInt index) ]
           , button
               [ type_ "button"
-              , on "click" (removeChild index)
+              , onClick (RemoveChildAt index)
               ]
               [ text "remove" ]
           ]
@@ -328,30 +274,16 @@ encodeValue value =
     Succeed integer -> E.int integer
     DecodeErr -> E.null
 
-encodeFoo : Foo -> E.Value
-encodeFoo doc =
-  E.object
-    [ ("name", (E.string doc.name))
-    , ("foo", (E.string doc.foo))
-    ]
-    
-encodeBar : Bar -> E.Value
-encodeBar doc =
-  E.object
-    [ ("name", (E.string doc.name))
-    , ("cmd", (E.string doc.cmd))
-    , ("files", (E.string doc.files))
-    ]
-
-encodeChild : Child -> E.Value
-encodeChild child =
+encodeCType : CType -> E.Value
+encodeCType child =
   case child of
-    Child1 doc -> (encodeFoo doc)
-    Child2 doc -> (encodeBar doc)
+    CTFoo content -> (Foo.encode content)
+    CTBar content -> (Bar.encode content)
+    CTBaz content -> (Baz.encode content)
 
-encodeChildren : List Child -> E.Value
+encodeChildren : List CType -> E.Value
 encodeChildren =
-  E.list encodeChild
+  E.list encodeCType
 
 encode : Model -> E.Value
 encode model =
@@ -379,52 +311,35 @@ valueDecoder =
     ]
   )
 
-addChild : String -> D.Decoder Msg
-addChild name =
-  D.succeed (AddChild name)
-
-removeChild : Int -> D.Decoder Msg
-removeChild index =
-  D.succeed (RemoveChildAt index)
-
-fooDecoder : D.Decoder Foo
-fooDecoder =
-  D.map2
-    Foo
-    (D.field "name" D.string)
-    (D.field "foo" D.string)
-
-barDecoder : D.Decoder Bar
-barDecoder =
-  D.map3
-    Bar
-    (D.field "name" D.string)
-    (D.field "cmd" D.string)
-    (D.field "files" D.string)
-
-checkName : String -> D.Decoder Child -> D.Decoder Child
-checkName name decoder =
+checkClassName : String -> D.Decoder CType -> D.Decoder CType
+checkClassName className decoder =
     D.andThen
-      (\doc ->
-        case doc of
-          Child1 child ->
-            if child.name == name then
-              (D.succeed doc)
+      (\child ->
+        case child of
+          CTFoo content ->
+            if content.className == className then
+              (D.succeed child)
             else
-              (D.fail name)
-          Child2 child ->
-            if child.name == name then
-              (D.succeed doc)
+              (D.fail className)
+          CTBar content ->
+            if content.className == className then
+              (D.succeed child)
             else
-              (D.fail name)
+              (D.fail className)
+          CTBaz content ->
+            if content.className == className then
+              (D.succeed child)
+            else
+              (D.fail className)
       )
       decoder
 
-childDecoder : D.Decoder Child
+childDecoder : D.Decoder CType
 childDecoder =
   D.oneOf
-    [ (checkName "Foo" (D.map Child1 fooDecoder))
-    , (checkName "Bar" (D.map Child2 barDecoder))
+    [ (checkClassName Foo.className (D.map CTFoo Foo.decoder))
+    , (checkClassName Bar.className (D.map CTBar Bar.decoder))
+    , (checkClassName Baz.className (D.map CTBaz Baz.decoder))
     ]
 
 modelDecoder : D.Decoder Model

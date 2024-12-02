@@ -5165,63 +5165,86 @@ var $author$project$Main$Model = F2(
 	function (value, children) {
 		return {children: children, value: value};
 	});
-var $author$project$Main$Child1 = function (a) {
-	return {$: 'Child1', a: a};
+var $author$project$Main$CTBar = function (a) {
+	return {$: 'CTBar', a: a};
 };
-var $author$project$Main$Child2 = function (a) {
-	return {$: 'Child2', a: a};
+var $author$project$Main$CTBaz = function (a) {
+	return {$: 'CTBaz', a: a};
 };
-var $author$project$Main$Bar = F3(
-	function (name, cmd, files) {
-		return {cmd: cmd, files: files, name: name};
-	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$map3 = _Json_map3;
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$barDecoder = A4(
-	$elm$json$Json$Decode$map3,
-	$author$project$Main$Bar,
-	A2($elm$json$Json$Decode$field, 'name', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'cmd', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'files', $elm$json$Json$Decode$string));
+var $author$project$Main$CTFoo = function (a) {
+	return {$: 'CTFoo', a: a};
+};
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$fail = _Json_fail;
-var $author$project$Main$checkName = F2(
-	function (name, decoder) {
+var $author$project$Main$checkClassName = F2(
+	function (className, decoder) {
 		return A2(
 			$elm$json$Json$Decode$andThen,
-			function (doc) {
-				if (doc.$ === 'Child1') {
-					var child = doc.a;
-					return _Utils_eq(child.name, name) ? $elm$json$Json$Decode$succeed(doc) : $elm$json$Json$Decode$fail(name);
-				} else {
-					var child = doc.a;
-					return _Utils_eq(child.name, name) ? $elm$json$Json$Decode$succeed(doc) : $elm$json$Json$Decode$fail(name);
+			function (child) {
+				switch (child.$) {
+					case 'CTFoo':
+						var content = child.a;
+						return _Utils_eq(content.className, className) ? $elm$json$Json$Decode$succeed(child) : $elm$json$Json$Decode$fail(className);
+					case 'CTBar':
+						var content = child.a;
+						return _Utils_eq(content.className, className) ? $elm$json$Json$Decode$succeed(child) : $elm$json$Json$Decode$fail(className);
+					default:
+						var content = child.a;
+						return _Utils_eq(content.className, className) ? $elm$json$Json$Decode$succeed(child) : $elm$json$Json$Decode$fail(className);
 				}
 			},
 			decoder);
 	});
-var $author$project$Main$Foo = F2(
-	function (name, foo) {
-		return {foo: foo, name: name};
+var $author$project$Bar$className = 'Bar';
+var $author$project$Baz$className = 'Baz';
+var $author$project$Foo$className = 'Foo';
+var $author$project$Bar$Bar = F3(
+	function (className, cmd, files) {
+		return {className: className, cmd: cmd, files: files};
 	});
-var $author$project$Main$fooDecoder = A3(
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$map3 = _Json_map3;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Bar$decoder = A4(
+	$elm$json$Json$Decode$map3,
+	$author$project$Bar$Bar,
+	A2($elm$json$Json$Decode$field, 'className', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'cmd', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'files', $elm$json$Json$Decode$string));
+var $author$project$Baz$Baz = F2(
+	function (className, value) {
+		return {className: className, value: value};
+	});
+var $author$project$Baz$decoder = A3(
 	$elm$json$Json$Decode$map2,
-	$author$project$Main$Foo,
-	A2($elm$json$Json$Decode$field, 'name', $elm$json$Json$Decode$string),
+	$author$project$Baz$Baz,
+	A2($elm$json$Json$Decode$field, 'className', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'value', $elm$json$Json$Decode$string));
+var $author$project$Foo$Foo = F2(
+	function (className, foo) {
+		return {className: className, foo: foo};
+	});
+var $author$project$Foo$decoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Foo$Foo,
+	A2($elm$json$Json$Decode$field, 'className', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'foo', $elm$json$Json$Decode$string));
 var $elm$json$Json$Decode$oneOf = _Json_oneOf;
 var $author$project$Main$childDecoder = $elm$json$Json$Decode$oneOf(
 	_List_fromArray(
 		[
 			A2(
-			$author$project$Main$checkName,
-			'Foo',
-			A2($elm$json$Json$Decode$map, $author$project$Main$Child1, $author$project$Main$fooDecoder)),
+			$author$project$Main$checkClassName,
+			$author$project$Foo$className,
+			A2($elm$json$Json$Decode$map, $author$project$Main$CTFoo, $author$project$Foo$decoder)),
 			A2(
-			$author$project$Main$checkName,
-			'Bar',
-			A2($elm$json$Json$Decode$map, $author$project$Main$Child2, $author$project$Main$barDecoder))
+			$author$project$Main$checkClassName,
+			$author$project$Bar$className,
+			A2($elm$json$Json$Decode$map, $author$project$Main$CTBar, $author$project$Bar$decoder)),
+			A2(
+			$author$project$Main$checkClassName,
+			$author$project$Baz$className,
+			A2($elm$json$Json$Decode$map, $author$project$Main$CTBaz, $author$project$Baz$decoder))
 		]));
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Main$Empty = function (a) {
@@ -5314,6 +5337,9 @@ var $elm$core$List$append = F2(
 			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
+var $author$project$Bar$default = A3($author$project$Bar$Bar, $author$project$Bar$className, '', '');
+var $author$project$Baz$default = A2($author$project$Baz$Baz, $author$project$Baz$className, '');
+var $author$project$Foo$default = A2($author$project$Foo$Foo, $author$project$Foo$className, '');
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -5349,40 +5375,56 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$encodeBar = function (doc) {
+var $author$project$Bar$encode = function (self) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
-				'name',
-				$elm$json$Json$Encode$string(doc.name)),
+				'className',
+				$elm$json$Json$Encode$string(self.className)),
 				_Utils_Tuple2(
 				'cmd',
-				$elm$json$Json$Encode$string(doc.cmd)),
+				$elm$json$Json$Encode$string(self.cmd)),
 				_Utils_Tuple2(
 				'files',
-				$elm$json$Json$Encode$string(doc.files))
+				$elm$json$Json$Encode$string(self.files))
 			]));
 };
-var $author$project$Main$encodeFoo = function (doc) {
+var $author$project$Baz$encode = function (self) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
-				'name',
-				$elm$json$Json$Encode$string(doc.name)),
+				'className',
+				$elm$json$Json$Encode$string(self.className)),
 				_Utils_Tuple2(
-				'foo',
-				$elm$json$Json$Encode$string(doc.foo))
+				'value',
+				$elm$json$Json$Encode$string(self.value))
 			]));
 };
-var $author$project$Main$encodeChild = function (child) {
-	if (child.$ === 'Child1') {
-		var doc = child.a;
-		return $author$project$Main$encodeFoo(doc);
-	} else {
-		var doc = child.a;
-		return $author$project$Main$encodeBar(doc);
+var $author$project$Foo$encode = function (self) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'className',
+				$elm$json$Json$Encode$string(self.className)),
+				_Utils_Tuple2(
+				'foo',
+				$elm$json$Json$Encode$string(self.foo))
+			]));
+};
+var $author$project$Main$encodeCType = function (child) {
+	switch (child.$) {
+		case 'CTFoo':
+			var content = child.a;
+			return $author$project$Foo$encode(content);
+		case 'CTBar':
+			var content = child.a;
+			return $author$project$Bar$encode(content);
+		default:
+			var content = child.a;
+			return $author$project$Baz$encode(content);
 	}
 };
 var $elm$json$Json$Encode$list = F2(
@@ -5394,7 +5436,7 @@ var $elm$json$Json$Encode$list = F2(
 				_Json_emptyArray(_Utils_Tuple0),
 				entries));
 	});
-var $author$project$Main$encodeChildren = $elm$json$Json$Encode$list($author$project$Main$encodeChild);
+var $author$project$Main$encodeChildren = $elm$json$Json$Encode$list($author$project$Main$encodeCType);
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$null = _Json_encodeNull;
 var $author$project$Main$encodeValue = function (value) {
@@ -5584,38 +5626,38 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					model,
 					$author$project$Main$remove(_Utils_Tuple0));
-			case 'AddChild':
-				var name = msg.a;
+			case 'AddCType':
+				var className = msg.a;
 				var maybe = function () {
-					switch (name) {
+					switch (className) {
 						case 'Foo':
 							return $elm$core$Maybe$Just(
-								$author$project$Main$Child1(
-									A2($author$project$Main$Foo, name, '')));
+								$author$project$Main$CTFoo($author$project$Foo$default));
 						case 'Bar':
 							return $elm$core$Maybe$Just(
-								$author$project$Main$Child2(
-									A3($author$project$Main$Bar, name, '', '')));
+								$author$project$Main$CTBar($author$project$Bar$default));
+						case 'Baz':
+							return $elm$core$Maybe$Just(
+								$author$project$Main$CTBaz($author$project$Baz$default));
 						default:
 							return $elm$core$Maybe$Nothing;
 					}
 				}();
-				var newModel = function () {
+				var newChildren = function () {
 					if (maybe.$ === 'Just') {
 						var child = maybe.a;
-						return _Utils_update(
-							model,
-							{
-								children: A2(
-									$elm$core$List$append,
-									model.children,
-									_List_fromArray(
-										[child]))
-							});
+						return A2(
+							$elm$core$List$append,
+							model.children,
+							_List_fromArray(
+								[child]));
 					} else {
-						return model;
+						return model.children;
 					}
 				}();
+				var newModel = _Utils_update(
+					model,
+					{children: newChildren});
 				return _Utils_Tuple2(
 					newModel,
 					$author$project$Main$store(
@@ -5635,11 +5677,11 @@ var $author$project$Main$update = F2(
 						$author$project$Main$encode(newModel)));
 			default:
 				var position = msg.a;
-				var newChild = msg.b;
+				var newCType = msg.b;
 				var children = model.children;
 				var newChildren = A2(
 					$elm$core$List$indexedMap,
-					A2($author$project$Main$replaceAt, position, newChild),
+					A2($author$project$Main$replaceAt, position, newCType),
 					children);
 				var newModel = _Utils_update(
 					model,
@@ -5651,26 +5693,44 @@ var $author$project$Main$update = F2(
 		}
 	});
 var $elm$json$Json$Decode$value = _Json_decodeValue;
+var $author$project$Main$AddCType = function (a) {
+	return {$: 'AddCType', a: a};
+};
 var $author$project$Main$Remove = {$: 'Remove'};
 var $author$project$Main$ValueChanged = function (a) {
 	return {$: 'ValueChanged', a: a};
 };
-var $author$project$Main$AddChild = function (a) {
-	return {$: 'AddChild', a: a};
-};
-var $author$project$Main$addChild = function (name) {
-	return $elm$json$Json$Decode$succeed(
-		$author$project$Main$AddChild(name));
-};
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $author$project$Main$RemoveChildAt = function (a) {
+	return {$: 'RemoveChildAt', a: a};
+};
 var $author$project$Main$ReplaceChildAt = F2(
 	function (a, b) {
 		return {$: 'ReplaceChildAt', a: a, b: b};
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5678,6 +5738,9 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			key,
 			$elm$json$Json$Encode$string(string));
 	});
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
@@ -5685,7 +5748,6 @@ var $elm$html$Html$Events$alwaysStop = function (x) {
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -5711,12 +5773,9 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$displayBar = F3(
-	function (index, doc, textChanged) {
+var $author$project$Bar$view = F2(
+	function (self, textChanged) {
 		return A2(
 			$elm$html$Html$div,
 			_List_Nil,
@@ -5727,7 +5786,7 @@ var $author$project$Main$displayBar = F3(
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(doc.name)
+							$elm$html$Html$text(self.className)
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -5746,12 +5805,12 @@ var $author$project$Main$displayBar = F3(
 										[
 											$elm$html$Html$Attributes$type_('text'),
 											$elm$html$Html$Attributes$name('cmd'),
-											$elm$html$Html$Attributes$value(doc.cmd),
+											$elm$html$Html$Attributes$value(self.cmd),
 											$elm$html$Html$Events$onInput(
 											textChanged(
 												function (text) {
 													return _Utils_update(
-														doc,
+														self,
 														{cmd: text});
 												}))
 										]),
@@ -5775,12 +5834,12 @@ var $author$project$Main$displayBar = F3(
 										[
 											$elm$html$Html$Attributes$type_('text'),
 											$elm$html$Html$Attributes$name('files'),
-											$elm$html$Html$Attributes$value(doc.files),
+											$elm$html$Html$Attributes$value(self.files),
 											$elm$html$Html$Events$onInput(
 											textChanged(
 												function (text) {
 													return _Utils_update(
-														doc,
+														self,
 														{files: text});
 												}))
 										]),
@@ -5789,8 +5848,8 @@ var $author$project$Main$displayBar = F3(
 						]))
 				]));
 	});
-var $author$project$Main$displayFoo = F3(
-	function (index, doc, textChanged) {
+var $author$project$Baz$view = F2(
+	function (self, textChanged) {
 		return A2(
 			$elm$html$Html$div,
 			_List_Nil,
@@ -5801,7 +5860,52 @@ var $author$project$Main$displayFoo = F3(
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text(doc.name)
+							$elm$html$Html$text(self.className)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$label,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text('value'),
+									A2(
+									$elm$html$Html$input,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$type_('text'),
+											$elm$html$Html$Attributes$name('value'),
+											$elm$html$Html$Attributes$value(self.value),
+											$elm$html$Html$Events$onInput(
+											textChanged(
+												function (text) {
+													return _Utils_update(
+														self,
+														{value: text});
+												}))
+										]),
+									_List_Nil)
+								]))
+						]))
+				]));
+	});
+var $author$project$Foo$view = F2(
+	function (self, textChanged) {
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h3,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(self.className)
 						])),
 					A2(
 					$elm$html$Html$div,
@@ -5820,12 +5924,12 @@ var $author$project$Main$displayFoo = F3(
 										[
 											$elm$html$Html$Attributes$type_('text'),
 											$elm$html$Html$Attributes$name('foo'),
-											$elm$html$Html$Attributes$value(doc.foo),
+											$elm$html$Html$Attributes$value(self.foo),
 											$elm$html$Html$Events$onInput(
 											textChanged(
 												function (text) {
 													return _Utils_update(
-														doc,
+														self,
 														{foo: text});
 												}))
 										]),
@@ -5834,53 +5938,36 @@ var $author$project$Main$displayFoo = F3(
 						]))
 				]));
 	});
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $author$project$Main$RemoveChildAt = function (a) {
-	return {$: 'RemoveChildAt', a: a};
-};
-var $author$project$Main$removeChild = function (index) {
-	return $elm$json$Json$Decode$succeed(
-		$author$project$Main$RemoveChildAt(index));
-};
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Main$displayChild = F2(
+var $author$project$Main$displayCType = F2(
 	function (index, child) {
-		var textChangedAt = function (ch) {
-			return function (cons) {
-				return function (text) {
-					return A2(
-						$author$project$Main$ReplaceChildAt,
-						index,
-						ch(
-							cons(text)));
-				};
-			};
-		};
+		var textChangedAt = F3(
+			function (ch, cons, text) {
+				return A2(
+					$author$project$Main$ReplaceChildAt,
+					index,
+					ch(
+						cons(text)));
+			});
 		var docHtml = function () {
-			if (child.$ === 'Child1') {
-				var doc = child.a;
-				return A3(
-					$author$project$Main$displayFoo,
-					index,
-					doc,
-					textChangedAt($author$project$Main$Child1));
-			} else {
-				var doc = child.a;
-				return A3(
-					$author$project$Main$displayBar,
-					index,
-					doc,
-					textChangedAt($author$project$Main$Child2));
+			switch (child.$) {
+				case 'CTFoo':
+					var content = child.a;
+					return A2(
+						$author$project$Foo$view,
+						content,
+						textChangedAt($author$project$Main$CTFoo));
+				case 'CTBar':
+					var content = child.a;
+					return A2(
+						$author$project$Bar$view,
+						content,
+						textChangedAt($author$project$Main$CTBar));
+				default:
+					var content = child.a;
+					return A2(
+						$author$project$Baz$view,
+						content,
+						textChangedAt($author$project$Main$CTBaz));
 			}
 		}();
 		return A2(
@@ -5916,10 +6003,8 @@ var $author$project$Main$displayChild = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Attributes$type_('button'),
-									A2(
-									$elm$html$Html$Events$on,
-									'click',
-									$author$project$Main$removeChild(index))
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$RemoveChildAt(index))
 								]),
 							_List_fromArray(
 								[
@@ -5933,12 +6018,6 @@ var $author$project$Main$displayChild = F2(
 						[docHtml]))
 				]));
 	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $author$project$Main$reasonToHtml = function (inputView) {
 	var _v0 = inputView.reason;
 	if (_v0.$ === 'Nothing') {
@@ -6076,10 +6155,8 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$type_('button'),
-								A2(
-								$elm$html$Html$Events$on,
-								'click',
-								$author$project$Main$addChild('Foo'))
+								$elm$html$Html$Events$onClick(
+								$author$project$Main$AddCType('Foo'))
 							]),
 						_List_fromArray(
 							[
@@ -6090,20 +6167,30 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$type_('button'),
-								A2(
-								$elm$html$Html$Events$on,
-								'click',
-								$author$project$Main$addChild('Bar'))
+								$elm$html$Html$Events$onClick(
+								$author$project$Main$AddCType('Bar'))
 							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text('add Bar')
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('button'),
+								$elm$html$Html$Events$onClick(
+								$author$project$Main$AddCType('Baz'))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('add Baz')
 							]))
 					])),
 				A2(
 				$elm$html$Html$div,
 				_List_Nil,
-				A2($elm$core$List$indexedMap, $author$project$Main$displayChild, model.children))
+				A2($elm$core$List$indexedMap, $author$project$Main$displayCType, model.children))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
