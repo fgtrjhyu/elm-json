@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
--- Name
+-- CLASSNAME
 className : String
 className = "Baz"
 
@@ -23,7 +23,7 @@ default =
 
 -- HTML
 view : Baz -> ((String -> Baz) -> (String -> msg)) -> Html msg
-view self textChanged =
+view self valueChanged =
   div [] 
     [ h3 [] 
         [ text self.className ]
@@ -36,7 +36,7 @@ view self textChanged =
                   type_ "text"
                 , name "value"
                 , value self.value
-                , onInput (textChanged (\text -> { self | value = text }))
+                , onInput (valueChanged (\text -> { self | value = text }))
                 ]
                 [
                 ]

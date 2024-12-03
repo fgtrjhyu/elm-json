@@ -230,15 +230,19 @@ view model =
           (model.children |> List.indexedMap displayCType)
       ]
 
+valueChangedAt : Int -> (Int -> v -> Msg) -> (c -> v) -> (a  -> c) -> a -> Msg
+valueChangedAt position msg variant cons value =
+  (msg position (variant (cons value)))
+
 displayCType : Int -> CType -> Html Msg
 displayCType index child =
   let
-    textChangedAt = (\ch cons text -> (ReplaceChildAt index (ch (cons text))))
+    replaceChildAt = (valueChangedAt index ReplaceChildAt)
     docHtml =
       case child of
-        CTFoo content -> (Foo.view content (textChangedAt CTFoo))
-        CTBar content -> (Bar.view content (textChangedAt CTBar))
-        CTBaz content -> (Baz.view content (textChangedAt CTBaz))
+        CTFoo content -> (Foo.view content (replaceChildAt CTFoo))
+        CTBar content -> (Bar.view content (replaceChildAt CTBar))
+        CTBaz content -> (Baz.view content (replaceChildAt CTBaz))
   in
     div
       [ style "border-top" "1px solid black"

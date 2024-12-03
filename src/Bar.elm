@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
--- TypeName
+-- CLASSNAME
 className : String
 className = "Bar"
 
@@ -24,7 +24,7 @@ default =
 
 -- HTML
 view : Bar -> ((String -> Bar) -> (String -> msg)) -> Html msg
-view self textChanged =
+view self valueChanged =
   div [] 
     [ h3 [] 
         [ text self.className ]
@@ -37,7 +37,7 @@ view self textChanged =
                   type_ "text"
                 , name "cmd"
                 , value self.cmd
-                , onInput (textChanged (\text -> { self | cmd = text }))
+                , onInput (valueChanged (\text -> { self | cmd = text }))
                 ]
                 [
                 ]
@@ -52,7 +52,7 @@ view self textChanged =
                   type_ "text"
                 , name "files"
                 , value self.files
-                , onInput (textChanged (\text -> { self | files = text }))
+                , onInput (valueChanged (\text -> { self | files = text }))
                 ]
                 [
                 ]
