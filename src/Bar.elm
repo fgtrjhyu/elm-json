@@ -10,7 +10,7 @@ import Html.Events exposing (..)
 className : String
 className = "Bar"
 
--- Bar
+-- DATA MODEL
 type alias Bar =
   { className : String
   , cmd : String
@@ -23,36 +23,46 @@ default =
   (Bar className "" "")
 
 -- HTML
-view : Bar -> ((String -> Bar) -> (String -> msg)) -> Html msg
-view self valueChanged =
+view : Bar
+  -> ((String -> Bar) -> (String -> msg))
+  -> ((a -> Bar) -> (a -> msg))
+  -> ((a -> Bar) -> (a -> msg))
+  -> ((a -> Bar) -> (a -> msg))
+  -> ((a -> Bar) -> (a -> msg))
+  -> ((a -> Bar) -> (a -> msg))
+  -> ((a -> Bar) -> (a -> msg))
+  -> ((a -> Bar) -> (a -> msg))
+  -> ((a -> Bar) -> (a -> msg))
+  -> ((a -> Bar) -> (a -> msg))
+  -> Html msg
+view self a _ _ _ _ _ _ _ _ _ =
   div [] 
-    [ h3 [] 
+    [ h3
+        [] 
         [ text self.className ]
-    , div []
-        [ 
-          label []
+    , div
+        []
+        [ label []
             [ text "cmd" 
             , input
-                [
-                  type_ "text"
+                [ type_ "text"
                 , name "cmd"
                 , value self.cmd
-                , onInput (valueChanged (\text -> { self | cmd = text }))
+                , onInput (a (\text -> { self | cmd = text }))
                 ]
                 [
                 ]
             ]
         ]
-    , div []
-        [ 
-          label []
+    , div
+        []
+        [ label []
             [ text "files" 
             , input
-                [
-                  type_ "text"
+                [ type_ "text"
                 , name "files"
                 , value self.files
-                , onInput (valueChanged (\text -> { self | files = text }))
+                , onInput (a (\text -> { self | files = text }))
                 ]
                 [
                 ]

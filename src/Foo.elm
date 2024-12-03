@@ -15,38 +15,75 @@ className = "Foo"
 type alias Foo =
   { className : String
   , size : S.Size
+  , greeting : String
   }
 
 -- DEFAULT
 default : Foo
 default =
-  (Foo className S.empty)
+  (Foo className S.empty "")
 
 -- HTML
-view : Foo -> ((String -> Foo) -> (String -> msg)) -> Html msg
-view self valueChanged =
-  div [] 
-    [ h3 [] 
-        [ text self.className ]
-    , div []
-        [ label
-            [ style "color" (colorOfSize self.size)
-            ]
-            [ text "foo" 
-            , input
-                [
-                  type_ "text"
-                , name "size"
-                , value (S.toString self.size)
-                , onInput (valueChanged (\text -> { self | size = (S.fromString text) }))
-                , style "border-color" (borderColorOfSize self.size)
-                ]
-                [
-                ]
-            ]
-        , (messageOfSize self.size)
-        ]
-    ]
+view : Foo
+  -> ((String -> Foo) -> (String -> msg))
+  -> ((a -> Foo) -> (a -> msg))
+  -> ((a -> Foo) -> (a -> msg))
+  -> ((a -> Foo) -> (a -> msg))
+  -> ((a -> Foo) -> (a -> msg))
+  -> ((a -> Foo) -> (a -> msg))
+  -> ((a -> Foo) -> (a -> msg))
+  -> ((a -> Foo) -> (a -> msg))
+  -> ((a -> Foo) -> (a -> msg))
+  -> ((a -> Foo) -> (a -> msg))
+  -> Html msg
+view self a _ _ _ _ _ _ _ _ _ =
+  let
+    getTargetValue = (D.at ["target", "value"] D.string)
+
+    setGreeting = (\value -> { self | greeting = value })
+
+    updateGreeting = (D.map (a setGreeting) getTargetValue)
+  in
+    div
+      [] 
+      [ h3
+          [] 
+          [ text self.className ]
+      , div
+          []
+          [ label
+              [ style "color" (colorOfSize self.size)
+              ]
+              [ text "size" 
+              , input
+                  [ type_ "text"
+                  , name "size"
+                  , value (S.toString self.size)
+                  , onInput (a (\text -> { self | size = (S.fromString text) }))
+                  , style "border-color" (borderColorOfSize self.size)
+                  ]
+                  [
+                  ]
+              ]
+          , (messageOfSize self.size)
+          ]
+      , div
+          []
+          [ label
+              []
+              [ text "greeting" 
+              , input
+                  [ type_ "text"
+                  , name "greeting"
+                  , value (self.greeting)
+                  , on "keyup" (updateGreeting)
+                  ]
+                  [
+                  ]
+              ]
+          , (messageOfSize self.size)
+          ]
+      ]
 
 colorOfSize : S.Size -> String
 colorOfSize size =
@@ -97,10 +134,11 @@ messageOfSize size =
 -- DECODER
 decoder : D.Decoder Foo
 decoder =
-  D.map2
+  D.map3
     Foo
     (D.field "className" D.string)
     (D.field "size" S.decoder)
+    (D.field "greeting" D.string)
 
 -- ENCODE
 encode : Foo -> E.Value
@@ -108,5 +146,6 @@ encode self =
   E.object
     [ ("className", (E.string self.className))
     , ("size", (S.encode self.size))
+    , ("greeting", (E.string self.greeting))
     ]
 

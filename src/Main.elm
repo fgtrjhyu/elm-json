@@ -202,14 +202,16 @@ view model =
               ]
               []
           ]
-      , div []
+      , div
+          []
           [ button
               [ type_ "button"
               , onClick Remove
               ]
               [ text "remove" ]
           ]
-      , div []
+      , div
+          []
           [ button
               [ type_ "button"
               , onClick (AddCType "Foo")
@@ -230,7 +232,7 @@ view model =
           (model.children |> List.indexedMap displayCType)
       ]
 
-valueChangedAt : Int -> (Int -> v -> Msg) -> (c -> v) -> (a  -> c) -> a -> Msg
+valueChangedAt : Int -> (Int -> v -> Msg) -> (c -> v) -> (a -> c) -> a -> Msg
 valueChangedAt position msg variant cons value =
   (msg position (variant (cons value)))
 
@@ -240,9 +242,21 @@ displayCType index child =
     replaceChildAt = (valueChangedAt index ReplaceChildAt)
     docHtml =
       case child of
-        CTFoo content -> (Foo.view content (replaceChildAt CTFoo))
-        CTBar content -> (Bar.view content (replaceChildAt CTBar))
-        CTBaz content -> (Baz.view content (replaceChildAt CTBaz))
+        CTFoo content ->
+          let
+            fn = (replaceChildAt CTFoo)
+          in
+            (Foo.view content fn fn fn fn fn fn fn fn fn fn)
+        CTBar content -> 
+          let
+            fn = (replaceChildAt CTBar)
+          in
+            (Bar.view content fn fn fn fn fn fn fn fn fn fn)
+        CTBaz content -> 
+          let
+            fn = (replaceChildAt CTBaz)
+          in
+            (Baz.view content fn fn fn fn fn fn fn fn fn fn)
   in
     div
       [ style "border-top" "1px solid black"
@@ -251,10 +265,8 @@ displayCType index child =
       [ div
           [ style "padding-top" "1em"
           ]
-          [
-            label
-              [
-                style "padding-right" "1em"
+          [ label
+              [ style "padding-right" "1em"
               ]
               [ text (String.fromInt index) ]
           , button
